@@ -1,167 +1,294 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>CTS — Cognition Topology Stack</title>
-  <link rel="icon" href="./cts-favicon.ico" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
-
-  <!-- Tailwind CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace'],
-            display: ['Space Grotesk', 'sans-serif'],
-          },
-          colors: {
-            background: 'hsl(0 0% 8%)',
-            foreground: 'hsl(0 0% 92%)',
-            muted: 'hsl(0 0% 60%)',
-          }
-        }
-      }
-    }
-  </script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CTS — Cognition Topology Stack [DRAFT v0]</title>
+<link rel="icon" href="./cts-favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cts-bg: #111111;
+  --cts-surface: #171717;
+  --cts-text: #F2F2F2;
+  --cts-text-secondary: #A6ADB7;
+  --cts-text-muted: #6F7782;
+  --cts-accent: #45D7FF;
+  --cts-border: #343434;
+  --cts-status-active: #7ED6A5;
+  --cts-content-max: 960px;
+  --cts-reading-max: 700px;
+  --cts-section-gap: 88px;
+  --cts-radius: 2px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--cts-bg);
+  color: var(--cts-text-secondary);
+  font-family: 'Inter', Arial, sans-serif;
+  font-size: 17px;
+  line-height: 1.65;
+}
+.wrap { max-width: var(--cts-content-max); margin: 0 auto; padding: 0 24px; }
+@media (min-width: 720px) { .wrap { padding: 0 40px; } }
+.reading { max-width: var(--cts-reading-max); }
+section { padding: var(--cts-section-gap) 0 0; }
+h1, h2, h3 { color: var(--cts-text); font-weight: 600; line-height: 1.2; }
+h1 { font-size: clamp(2rem, 5vw, 3.1rem); letter-spacing: -0.02em; }
+h2 { font-size: 1.6rem; margin-bottom: 20px; }
+h3 { font-size: 1.05rem; margin-bottom: 8px; }
+p { margin-bottom: 16px; }
+a { color: var(--cts-accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.label {
+  font-family: 'IBM Plex Mono', Consolas, monospace;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--cts-text-muted);
+  display: block;
+  margin-bottom: 14px;
+}
+.label--accent { color: var(--cts-accent); }
+.mono { font-family: 'IBM Plex Mono', Consolas, monospace; }
+.divider { border: 0; border-top: 1px solid var(--cts-border); margin: 56px 0; }
+.btn {
+  display: inline-block;
+  padding: 12px 22px;
+  border: 1px solid var(--cts-accent);
+  border-radius: var(--cts-radius);
+  color: var(--cts-accent);
+  font-family: 'IBM Plex Mono', Consolas, monospace;
+  font-size: 0.85rem;
+  background: transparent;
+  transition: background-color 180ms ease;
+}
+.btn:hover { background: rgba(69, 215, 255, 0.08); text-decoration: none; }
+.btn--quiet { border-color: var(--cts-border); color: var(--cts-text-secondary); }
+.panel {
+  background: var(--cts-surface);
+  border: 1px solid var(--cts-border);
+  border-radius: var(--cts-radius);
+  padding: 28px;
+}
+.placeholder {
+  color: var(--cts-text-muted);
+  font-family: 'IBM Plex Mono', Consolas, monospace;
+  font-size: 0.85rem;
+}
+/* Header */
+header {
+  border-bottom: 1px solid var(--cts-border);
+  padding: 18px 0;
+}
+header .wrap { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 12px; }
+.wordmark { color: var(--cts-text); font-weight: 700; font-size: 1rem; letter-spacing: 0.02em; }
+.wordmark span { color: var(--cts-text-muted); font-weight: 400; }
+nav a { color: var(--cts-text-secondary); font-size: 0.85rem; margin-left: 22px; }
+nav a:hover { color: var(--cts-accent); }
+/* Hero */
+.hero { padding: 110px 0 0; }
+.hero .thesis { color: var(--cts-text); font-size: 1.25rem; margin: 26px 0 6px; font-weight: 500; }
+.hero .boundary { color: var(--cts-text-muted); margin-bottom: 36px; }
+.cta-row { display: flex; gap: 14px; flex-wrap: wrap; }
+/* Failure list */
+.failure { padding: 26px 0; border-bottom: 1px solid var(--cts-border); }
+.failure:last-of-type { border-bottom: 0; }
+.failure h3 { display: inline; margin-right: 10px; }
+.failure p { display: inline; margin: 0; }
+.failure .num { font-family: 'IBM Plex Mono', Consolas, monospace; color: var(--cts-text-muted); font-size: 0.8rem; margin-right: 14px; }
+/* Proof */
+.proof-media { margin: 28px 0; text-align: center; padding: 64px 28px; }
+.beforeafter { display: grid; gap: 20px; grid-template-columns: 1fr; margin-top: 28px; }
+@media (min-width: 720px) { .beforeafter { grid-template-columns: 1fr 1fr; } }
+.beforeafter .mono-block {
+  font-family: 'IBM Plex Mono', Consolas, monospace;
+  font-size: 0.82rem;
+  color: var(--cts-text-secondary);
+  white-space: pre-wrap;
+  margin-top: 12px;
+}
+.ok { color: var(--cts-status-active); }
+/* Architecture */
+.layer { padding: 24px 0; border-bottom: 1px solid var(--cts-border); }
+.layer:last-of-type { border-bottom: 0; }
+.lifecycle {
+  font-family: 'IBM Plex Mono', Consolas, monospace;
+  font-size: 0.82rem;
+  color: var(--cts-text-muted);
+  margin-top: 8px;
+}
+/* Implementations */
+.impl { display: flex; justify-content: space-between; align-items: baseline; padding: 18px 0; border-bottom: 1px solid var(--cts-border); flex-wrap: wrap; gap: 6px; }
+.impl:last-of-type { border-bottom: 0; }
+.impl .name { color: var(--cts-text); font-weight: 500; }
+.impl .role { color: var(--cts-text-muted); font-size: 0.9rem; }
+/* Footer */
+footer { margin-top: var(--cts-section-gap); border-top: 1px solid var(--cts-border); padding: 56px 0 72px; }
+.status { display: inline-flex; align-items: center; gap: 8px; font-family: 'IBM Plex Mono', Consolas, monospace; font-size: 0.75rem; color: var(--cts-text-muted); margin-top: 28px; }
+.status .dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--cts-status-active);
+  animation: pulse 2.4s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
+.draftbar {
+  background: var(--cts-surface);
+  border-bottom: 1px solid var(--cts-border);
+  padding: 8px 0;
+  font-family: 'IBM Plex Mono', Consolas, monospace;
+  font-size: 0.72rem;
+  color: var(--cts-text-muted);
+  text-align: center;
+}
+</style>
 </head>
+<body>
 
-<body class="bg-background text-foreground antialiased">
+<div class="draftbar">DRAFT v0 — internal review only · not deployed · [BRACKETS] = unresolved placeholders</div>
 
-  <main class="min-h-screen px-6 py-24">
-    <div class="mx-auto max-w-3xl space-y-20">
+<header>
+  <div class="wrap">
+    <div class="wordmark">CTS <span>— Cognition Topology Stack</span></div>
+    <nav>
+      <a href="#proof">Demonstration</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#implementations">Implementations</a>
+      <a href="#governance">Governance</a>
+    </nav>
+  </div>
+</header>
 
-      <!-- Header -->
-      <header class="space-y-4">
-        <h1 class="font-display text-4xl font-semibold tracking-tight">
-          CTS — Cognition Topology Stack
-        </h1>
-        <p class="text-lg text-muted">
-          Structural Substrate for Durable Cognition
-        </p>
-      </header>
-
-      <!-- Assertion -->
-      <section>
-        <p class="text-lg leading-relaxed">
-          CTS defines the structural substrate for a local-first cognitive system. It governs how knowledge, context, and relationships are organized, bounded, and evolved over time. CTS is not the system itself, but the topology that enables a Cognitive Operating Environment (COE) to emerge through the interaction of tools and governance.
-        </p>
-      </section>
-
-      <!-- Boundary -->
-      <section class="space-y-4">
-        <h2 class="mt-16 text-xl font-medium tracking-tight">
-          What CTS Is Not
-        </h2>
-        <ul class="mt-4 space-y-2 text-muted list-disc list-inside">
-          <li>CTS is not an application</li>
-          <li>CTS is not a productivity system</li>
-          <li>CTS is not the Cognitive Operating Environment (COE)</li>
-        </ul>
-      </section>
-
-      <!-- Canon -->
-      <section class="space-y-4">
-        <hr class="my-16 border-muted">
-        <h2 class="text-xl font-medium tracking-tight">
-          Authoritative Artifacts
-        </h2>
-        <ul class="mt-4 space-y-2 text-muted list-disc list-inside">
-          <li>Topology Definitions</li>
-          <li>Governance Canon</li>
-          <li>Metadata Schema</li>
-          <li>Artifact & Provenance Model</li>
-        </ul>
-        <p class="text-sm italic text-muted">
-          This page signals the system. Authority resides in governed artifacts.
-        </p>
-      </section>
-
-      <!-- Scope -->
-      <section class="space-y-4">
-        <h2 class="mt-16 text-xl font-medium tracking-tight">
-          Out of Scope (MVAP)
-        </h2>
-        <ul class="mt-4 space-y-2 text-muted list-disc list-inside">
-          <li>Full system exposition (COE)</li>
-          <li>Comprehensive tool suite presentation</li>
-          <li>Feature-driven positioning or claims</li>
-        </ul>
-      </section>
-
-      <!-- First Working Capability -->
-      <section class="space-y-4">
-        <h2 class="mt-16 text-xl font-medium tracking-tight">
-          First Working Capability
-        </h2>
-        <p class="text-muted leading-relaxed">
-          Document Context Search (DCS) is a CTS-aligned, local-first retrieval tool that demonstrates how topology and governance can be operationalized into a usable capability. It serves as a minimal, functional proof that CTS can support real interaction without compromising structural integrity.
-        </p>
-      </section>
-
-      <!-- Diagram -->
-      <section class="space-y-8">
-        <h2 class="mt-16 text-xl font-medium tracking-tight">
-          System Structure
-        </h2>
-
-        <div class="flex flex-col items-center space-y-10">
-
-          <!-- Globe -->
-          <div class="flex flex-col items-center space-y-2">
-            <img src="/cts-globe-256.png" alt="COE" class="w-20 h-20 opacity-90" />
-            <p class="text-sm text-muted font-mono">
-              COE — Cognitive Operating Environment
-            </p>
-          </div>
-
-          <!-- Connector -->
-          <div class="h-6 border-l border-muted"></div>
-
-          <!-- Pillars -->
-          <div class="grid grid-cols-3 gap-10 text-center">
-
-            <div class="space-y-2">
-              <p class="text-sm font-medium">Topology</p>
-              <p class="text-xs text-muted">(CTS)</p>
-            </div>
-
-            <div class="space-y-2">
-              <p class="text-sm font-medium">Tools</p>
-              <p class="text-xs text-muted">(WEN, DCS)</p>
-            </div>
-
-            <div class="space-y-2">
-              <p class="text-sm font-medium">Governance</p>
-              <p class="text-xs text-muted">(Artifacts, Metadata)</p>
-            </div>
-
-          </div>
-
-        </div>
-      </section>
-
-      <!-- Signal -->
-      <section>
-        <p class="font-mono text-sm text-muted">
-          System emerging.
-        </p>
-      </section>
-
-      <!-- Footer -->
-      <footer class="mt-24 text-sm text-muted">
-        CTS — cognition topology stack
-      </footer>
-
+<!-- S1 · Hero -->
+<section class="hero">
+  <div class="wrap reading">
+    <span class="label label--accent">Governed cognitive infrastructure</span>
+    <h1>Storage does not make information governed.</h1>
+    <p class="thesis">CTS is an architectural substrate for preserving context, provenance, and continuity across knowledge work.</p>
+    <p class="boundary">Not a tool. Not an app. Infrastructure.</p>
+    <div class="cta-row">
+      <a class="btn" href="#proof">Watch the governance demonstration</a>
+      <a class="btn btn--quiet" href="#architecture">Architecture</a>
     </div>
-  </main>
+  </div>
+</section>
+
+<!-- S2 · Problem frame -->
+<section>
+  <div class="wrap reading">
+    <span class="label">The failure mode</span>
+    <h2>Knowledge work decays by default.</h2>
+    <div class="failure"><span class="num">01</span><h3>Context disappears.</h3><p>Every session restarts. The reasoning behind decisions evaporates before it matters again.</p></div>
+    <div class="failure"><span class="num">02</span><h3>Provenance is lost.</h3><p>Outputs lose attribution. Work accumulates without the relationships that make it legible later.</p></div>
+    <div class="failure"><span class="num">03</span><h3>Recall degrades.</h3><p>Search returns documents, not understanding. Projects dissolve into disconnected artifacts.</p></div>
+    <div class="failure"><span class="num">04</span><h3>Systems decay.</h3><p>Without governance, entropy wins. Meaning dissipates and the knowledge environment becomes a liability.</p></div>
+    <p style="margin-top:28px; color: var(--cts-text);">This is an architectural failure. CTS addresses it at the structural level.</p>
+  </div>
+</section>
+
+<!-- S3 · Proof -->
+<section id="proof">
+  <div class="wrap">
+    <span class="label label--accent">Demonstration</span>
+    <h2 class="reading">CTS demonstrates a governed admission model.</h2>
+    <p class="reading">A plain text note is carried from capture to governed artifact. Before admission, the candidate is not yet an Artifact. After an explicit admission act, CTS confers artifact identity, records the decision, and writes the event chain. Same content. One governance act in between.</p>
+    <div class="panel proof-media">
+      <span class="placeholder">[ DEMO_VIDEO — recorded demonstration on committed demo artifacts, 3:00 ]</span>
+    </div>
+    <div class="beforeafter">
+      <div class="panel">
+        <span class="label">Before admission</span>
+        <div class="mono-block">$ validate governance_candidate
+[FAIL] demo-note.txt.md
+FAIL V06: artifact_id present on candidate-class document (D2: conferred only at Admission)
+FAIL V08: legitimacy_state present on candidate-class document (D2: conferred only at Admission)
+Files: 1  |  hard failures: 2  |  warnings: 0
+exit 1 — expected boundary finding</div>
+      </div>
+      <div class="panel">
+        <span class="label">After admission</span>
+        <div class="mono-block">$ validate artifact
+<span class="ok">[OK] demo-note.txt.md</span>
+artifact_id: 1 unique across 1 id-bearing files
+V07 uniqueness: PASS
+Files: 1  |  hard failures: 0  |  warnings: 0
+<span class="ok">exit 0</span></div>
+      </div>
+    </div>
+    <p class="reading" style="margin-top:24px; color: var(--cts-text-muted); font-size: 0.9rem;">Recorded demonstration on committed demo artifacts. The admission executor stands in for admission tooling that is still in development.</p>
+  </div>
+</section>
+
+<!-- S4 · Consequence -->
+<section>
+  <div class="wrap reading">
+    <span class="label">Consequence</span>
+    <h2>Context that survives.</h2>
+    <p>Because governed status is explicit and recorded — never inferred from where a file happens to live — context and provenance persist across tools, migrations, and time. Knowledge work accumulates instead of decaying.</p>
+  </div>
+</section>
+
+<!-- S5 · Architecture -->
+<section id="architecture">
+  <div class="wrap reading">
+    <span class="label">System structure</span>
+    <h2>Three layers. One substrate.</h2>
+    <div class="layer">
+      <h3>Topology <span class="role" style="color:var(--cts-text-muted); font-weight:400;">· structure</span></h3>
+      <p style="margin:0;">Defines how knowledge spaces are bounded, related, and evolved. Tools operate within it; they do not define it.</p>
+    </div>
+    <div class="layer">
+      <h3>Tools <span style="color:var(--cts-text-muted); font-weight:400;">· execution</span></h3>
+      <p style="margin:0;">CTS-aligned capabilities that operationalize the topology within defined structural boundaries.</p>
+    </div>
+    <div class="layer">
+      <h3>Governance <span style="color:var(--cts-text-muted); font-weight:400;">· coherence</span></h3>
+      <p style="margin:0;">Meaning binds to artifacts, not tools. Governed metadata, provenance, and artifact semantics keep the system coherent under change.</p>
+      <p class="lifecycle">Object → Proto Candidate Package → Forge Intake → Proto Artifact → Governance Candidate → Artifact</p>
+    </div>
+    <p style="margin-top:28px; color:var(--cts-text-muted);">When the three layers operate together with structural integrity intact, the result is a Cognitive Operating Environment — an emergent property, not a component.</p>
+  </div>
+</section>
+
+<!-- S6 · Implementations -->
+<section id="implementations">
+  <div class="wrap reading">
+    <span class="label">Operational expressions</span>
+    <h2>Built under CTS discipline.</h2>
+    <p>Each capability below is an operational expression of CTS — a way of producing, querying, or projecting governed artifacts. None of them is CTS itself.</p>
+    <div class="impl"><span class="name">DCS — Document Context Search</span><span class="role">local-first governed retrieval · <a href="#">[DCS_LINK]</a></span></div>
+    <div class="impl"><span class="name">WEN</span><span class="role">command surface</span></div>
+    <div class="impl"><span class="name">CommandDeck</span><span class="role">operational control surface</span></div>
+    <div class="impl"><span class="name">IngestCore</span><span class="role">pre-governance capture and staging</span></div>
+    <div class="impl"><span class="name">CWT</span><span class="role">workflow tooling</span></div>
+  </div>
+</section>
+
+<!-- S7 · Governance & dispatches -->
+<section id="governance">
+  <div class="wrap reading">
+    <span class="label">Governance</span>
+    <h2>A governed corpus, staged for release.</h2>
+    <p>CTS is defined by a corpus of governance artifacts — lexicons, contracts, and policies maintained under CTS discipline. Public release of the corpus is staged.</p>
+    <hr class="divider">
+    <span class="label">Dispatches</span>
+    <p class="placeholder">[DISPATCH_1] · [DISPATCH_2] · [DISPATCH_3]</p>
+  </div>
+</section>
+
+<!-- S8 · Footer -->
+<footer>
+  <div class="wrap reading">
+    <p style="color: var(--cts-text); font-size: 1.15rem; font-weight: 500;">Storage does not make information governed.<br>CTS is the infrastructure that does.</p>
+    <a class="btn" href="#proof">Watch the governance demonstration</a>
+    <div class="status"><span class="dot"></span> SUBSTRATE IN DEVELOPMENT</div>
+    <div style="margin-top:36px;">
+      <img src="./cts-globe-256.png" alt="CTS globe mark" width="120" height="120" style="display:block;">
+    </div>
+    <p class="placeholder" style="margin-top:24px;">[GITHUB_LINK]</p>
+  </div>
+</footer>
 
 </body>
 </html>

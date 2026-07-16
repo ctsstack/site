@@ -1,0 +1,33 @@
+/* CTS Brand Tokens — v0 (per CTS Minimalist Web Branding Guidance, 2026-07-11)
+   Status: provisional, non-canonical. Supersedes the April 2026 design system. */
+
+:root {
+  /* Color */
+  --cts-bg: #111111;             /* page background */
+  --cts-surface: #171717;        /* raised panels, code blocks, media frames */
+  --cts-text: #F2F2F2;           /* headings, essential statements */
+  --cts-text-secondary: #A6ADB7; /* body copy */
+  --cts-text-muted: #6F7782;     /* captions, labels, metadata */
+  --cts-accent: #45D7FF;         /* sole general-purpose accent; <10% of page */
+  --cts-border: #343434;         /* hairlines, dividers */
+  --cts-status-active: #7ED6A5;  /* operational status only; sparing */
+
+  /* Layout */
+  --cts-content-max: 960px;
+  --cts-reading-max: 700px;
+  --cts-section-gap: 88px;
+  --cts-radius: 2px;
+
+  /* Type */
+  --cts-font-sans: 'Inter', Arial, system-ui, sans-serif;
+  --cts-font-mono: 'IBM Plex Mono', Consolas, monospace;
+}
+
+/* Constraints (enforced by convention, not CSS):
+   - Cyan is the only general accent. No subsystem colors on the landing page.
+   - No red, gold, violet, or neon gradients as core branding.
+   - No pure white (#FFF) or pure black (#000).
+   - Sentence case headings; uppercase reserved for small mono labels.
+   - Body 16-18px desktop; line length 60-75 characters.
+   - No parallax, no particle fields; hover transitions < 200ms.
+   - Page must read complete with JavaScript disabled. */
