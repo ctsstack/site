@@ -4,6 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CTS — Cognition Topology Stack [DRAFT v0]</title>
+<meta property="og:title" content="CTS — Cognition Topology Stack">
+<meta property="og:description" content="Storage does not make information governed. CTS is governed cognitive infrastructure.">
+<meta property="og:image" content="https://ctsstack.com/cts-og-card.png">
+<meta property="og:url" content="https://ctsstack.com/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="./cts-favicon.ico">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -166,12 +172,12 @@ footer { margin-top: var(--cts-section-gap); border-top: 1px solid var(--cts-bor
     <span class="label label--accent">Governed cognitive infrastructure</span>
     <div style="display:flex; align-items:center; gap:32px; flex-wrap:wrap;">
       <h1 style="flex:1; min-width:280px;">Storage does not make information governed.</h1>
-      <img src="./cts-globe-256.png" alt="CTS globe mark" width="96" height="96" style="flex-shrink:0;">
+      <img src="./cts-orb-256.png" alt="CTS globe mark" width="140" height="140" style="flex-shrink:0;">
     </div>
     <p class="thesis">CTS is an architectural substrate for preserving context, provenance, and continuity across knowledge work.</p>
     <p class="boundary">Not a tool. Not an app. Infrastructure.</p>
     <div class="cta-row">
-      <a class="btn" href="#proof">Watch the governance demonstration</a>
+      <a class="btn" href="#proof">See Forge Lite in action</a>
       <a class="btn btn--quiet" href="#architecture">Architecture</a>
     </div>
   </div>
@@ -193,33 +199,34 @@ footer { margin-top: var(--cts-section-gap); border-top: 1px solid var(--cts-bor
 <!-- S3 · Proof -->
 <section id="proof">
   <div class="wrap">
-    <span class="label label--accent">Demonstration</span>
-    <h2 class="reading">CTS demonstrates a governed admission model.</h2>
-    <p class="reading">A plain text note is carried from capture to governed artifact. Before admission, the candidate is not yet an Artifact. After an explicit admission act, CTS confers artifact identity, records the decision, and writes the event chain. Same content. One governance act in between.</p>
+    <span class="label label--accent">Forge Lite demonstration</span>
+    <h2 class="reading">Forge Lite demonstrates a core CTS principle.</h2>
+    <p class="reading">Forge Lite — the working, reduced-friction implementation of Forge — carries a captured object through intake to governed artifact. Before admission, the candidate is valid but ungoverned: no identity, no legitimacy. The admission act confers both, and every step is recorded and lineage-verified. Same content. One governance act in between.</p>
+    <p class="reading lifecycle" style="margin-bottom:8px;">Forge Lite path: Object → Intake → Candidate → Admission → Artifact</p>
     <div class="panel proof-media">
       <span class="placeholder">[ DEMO_VIDEO — recorded demonstration on committed demo artifacts, 3:00 ]</span>
     </div>
     <div class="beforeafter">
       <div class="panel">
-        <span class="label">Before admission</span>
-        <div class="mono-block">$ validate governance_candidate
-[FAIL] demo-note.txt.md
-FAIL V06: artifact_id present on candidate-class document (D2: conferred only at Admission)
-FAIL V08: legitimacy_state present on candidate-class document (D2: conferred only at Admission)
-Files: 1  |  hard failures: 2  |  warnings: 0
-exit 1 — expected boundary finding</div>
+        <span class="label">Before admission — valid Candidate</span>
+        <div class="mono-block">$ inspect governance_candidate
+demo-note.txt.md
+  governance_class:  candidate
+  artifact_id:       absent — conferred only at Admission
+  legitimacy_state:  absent — conferred only at Admission
+<span class="ok">[OK] valid Candidate — eligible for admission</span></div>
       </div>
       <div class="panel">
-        <span class="label">After admission</span>
-        <div class="mono-block">$ validate artifact
-<span class="ok">[OK] demo-note.txt.md</span>
-artifact_id: 1 unique across 1 id-bearing files
-V07 uniqueness: PASS
-Files: 1  |  hard failures: 0  |  warnings: 0
-<span class="ok">exit 0</span></div>
+        <span class="label">After admission — verified</span>
+        <div class="mono-block">$ verify artifact
+demo-note.txt.md
+  artifact_id:       cts-f59e49e40688
+  legitimacy_state:  legitimate
+  events:            ARTIFACT_ADMITTED → LINEAGE_SEALED
+  seal recompute:    <span class="ok">MATCH — lineage VERIFIED</span></div>
       </div>
     </div>
-    <p class="reading" style="margin-top:24px; color: var(--cts-text-muted); font-size: 0.9rem;">Recorded demonstration on committed demo artifacts. The admission executor stands in for admission tooling that is still in development.</p>
+    <p class="reading" style="margin-top:24px; color: var(--cts-text-muted); font-size: 0.9rem;">Recorded demonstration on committed demo artifacts. Forge Lite is a working implementation; full Forge integration with the hardened governance system remains in development.</p>
   </div>
 </section>
 
@@ -248,7 +255,8 @@ Files: 1  |  hard failures: 0  |  warnings: 0
     <div class="layer">
       <h3>Governance <span style="color:var(--cts-text-muted); font-weight:400;">· coherence</span></h3>
       <p style="margin:0;">Meaning binds to artifacts, not tools. Governed metadata, provenance, and artifact semantics keep the system coherent under change.</p>
-      <p class="lifecycle">Object → Proto Candidate Package → Forge Intake → Proto Artifact → Governance Candidate → Artifact</p>
+      <p class="lifecycle">Full CTS lifecycle: Object → Proto Candidate Package → Forge Intake → Proto Artifact → Governance Candidate → Admission → Artifact</p>
+      <p class="lifecycle" style="margin-top:4px;">Demonstrated by Forge Lite in simplified profile: Object → Intake → Candidate → Admission → Artifact</p>
     </div>
     <p style="margin-top:28px; color:var(--cts-text-muted);">When the three layers operate together with structural integrity intact, the result is a Cognitive Operating Environment — an emergent property, not a component.</p>
   </div>
@@ -260,10 +268,11 @@ Files: 1  |  hard failures: 0  |  warnings: 0
     <span class="label">Operational expressions</span>
     <h2>Built under CTS discipline.</h2>
     <p>Each capability below is an operational expression of CTS — a way of producing, querying, or projecting governed artifacts. None of them is CTS itself.</p>
+    <div class="impl"><span class="name">Forge</span><span class="role">governed artifact formation, admission, and lineage — hardened-governance integration in development</span></div>
+    <div class="impl"><span class="name">Forge Lite</span><span class="role">working reduced-friction admission implementation and demonstration profile</span></div>
     <div class="impl"><span class="name">DCS — Document Context Search</span><span class="role">local-first governed retrieval · <a href="#">[DCS_LINK]</a></span></div>
     <div class="impl"><span class="name">WEN</span><span class="role">command surface</span></div>
     <div class="impl"><span class="name">CommandDeck</span><span class="role">operational control surface</span></div>
-    <div class="impl"><span class="name">IngestCore</span><span class="role">pre-governance capture and staging</span></div>
     <div class="impl"><span class="name">CWT</span><span class="role">workflow tooling</span></div>
   </div>
 </section>
@@ -284,10 +293,10 @@ Files: 1  |  hard failures: 0  |  warnings: 0
 <footer>
   <div class="wrap reading">
     <p style="color: var(--cts-text); font-size: 1.15rem; font-weight: 500;">Storage does not make information governed.<br>CTS is the infrastructure that does.</p>
-    <a class="btn" href="#proof">Watch the governance demonstration</a>
+    <a class="btn" href="#proof">See Forge Lite in action</a>
     <div class="status"><span class="dot"></span> SUBSTRATE IN DEVELOPMENT</div>
     <div style="margin-top:36px;">
-      <img src="./cts-globe-256.png" alt="CTS globe mark" width="120" height="120" style="display:block;">
+      <img src="./cts-orb-128.png" alt="CTS globe mark" width="120" height="120" style="display:block;">
     </div>
     <p class="placeholder" style="margin-top:24px;">[GITHUB_LINK]</p>
   </div>
