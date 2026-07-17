@@ -209,24 +209,26 @@ footer { margin-top: var(--cts-section-gap); border-top: 1px solid var(--cts-bor
     <div class="beforeafter">
       <div class="panel">
         <span class="label">Before admission — valid Candidate</span>
-        <div class="mono-block">$ inspect governance_candidate
-demo-note.txt.md
-  governance_class:  candidate
-  artifact_id:       absent — conferred only at Admission
-  legitimacy_state:  absent — conferred only at Admission
-<span class="ok">[OK] valid Candidate — eligible for admission</span></div>
+        <div class="mono-block">$ python demo.py inspect candidate
+candidate:   gc-59569f536690
+object:      welcome-note.txt
+sha256:      1acf226a4b28…336d2a79
+stage:       candidate — valid, ungoverned
+ABSENT by design: artifact_id, legitimacy_state</div>
       </div>
       <div class="panel">
         <span class="label">After admission — verified</span>
-        <div class="mono-block">$ verify artifact
-demo-note.txt.md
-  artifact_id:       cts-f59e49e40688
-  legitimacy_state:  legitimate
-  events:            ARTIFACT_ADMITTED → LINEAGE_SEALED
-  seal recompute:    <span class="ok">MATCH — lineage VERIFIED</span></div>
+        <div class="mono-block">$ python demo.py verify
+V1 object digest integrity       <span class="ok">[PASS]</span>
+V2 candidate purity and binding  <span class="ok">[PASS]</span>
+V3 artifact identity             <span class="ok">[PASS]</span> cts-1def5a71337a · LEGITIMATE
+V4 evidence presence             <span class="ok">[PASS]</span> ARTIFACT_ADMITTED → LINEAGE_SEALED
+V5 lineage-seal recomputation    <span class="ok">[PASS]</span> seal 2af65b7a… recomputed
+<span class="ok">RESULT: VERIFIED</span></div>
       </div>
     </div>
-    <p class="reading" style="margin-top:24px; color: var(--cts-text-muted); font-size: 0.9rem;">Recorded demonstration on committed demo artifacts. Forge Lite is a working implementation; full Forge integration with the hardened governance system remains in development.</p>
+    <p class="reading" style="margin-top:16px; color: var(--cts-text-muted); font-size: 0.9rem;">Between the two panels sits one explicit act: the operator typed <span class="mono">ADMIT</span>. Identity and legitimacy were created by that act — recorded, digest-chained, and recomputable from the evidence.</p>
+    <p class="reading" style="margin-top:12px; color: var(--cts-text-muted); font-size: 0.9rem;">Output from preserved run <span class="mono">golden_run_001</span> — real output, not a mockup. Forge Lite is a working implementation; full Forge integration with the hardened governance system remains in development.</p>
   </div>
 </section>
 
