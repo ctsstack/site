@@ -1,0 +1,56 @@
+<svg viewBox="0 0 960 250" xmlns="http://www.w3.org/2000/svg" font-family="'IBM Plex Mono', Consolas, monospace">
+  <!-- CTS admission lifecycle — brand tokens per Minimalist Web Branding Guidance -->
+  <defs>
+    <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M1,1 L7,4 L1,7" fill="none" stroke="#6F7782" stroke-width="1.2"/>
+    </marker>
+  </defs>
+
+  <!-- zone labels -->
+  <text x="205" y="36" fill="#6F7782" font-size="11" letter-spacing="2" text-anchor="middle">PRE-GOVERNANCE</text>
+  <text x="750" y="36" fill="#6F7782" font-size="11" letter-spacing="2" text-anchor="middle">GOVERNED</text>
+
+  <!-- boundary -->
+  <line x1="480" y1="50" x2="480" y2="200" stroke="#343434" stroke-width="1" stroke-dasharray="4 5"/>
+
+  <!-- Object -->
+  <rect x="30" y="95" width="150" height="60" rx="2" fill="#171717" stroke="#343434"/>
+  <text x="105" y="121" fill="#F2F2F2" font-size="13" text-anchor="middle">Object</text>
+  <text x="105" y="140" fill="#6F7782" font-size="10" text-anchor="middle">captured</text>
+
+  <!-- Intake -->
+  <rect x="230" y="95" width="70" height="60" rx="2" fill="#171717" stroke="#343434"/>
+  <text x="265" y="128" fill="#F2F2F2" font-size="13" text-anchor="middle">Intake</text>
+
+  <!-- Candidate -->
+  <rect x="325" y="95" width="105" height="60" rx="2" fill="#171717" stroke="#343434"/>
+  <text x="377" y="121" fill="#F2F2F2" font-size="13" text-anchor="middle">Candidate</text>
+  <text x="377" y="140" fill="#6F7782" font-size="10" text-anchor="middle">valid · ungoverned</text>
+
+  <!-- Admission act -->
+  <rect x="450" y="87" width="160" height="76" rx="2" fill="#171717" stroke="#45D7FF" stroke-width="1.2"/>
+  <text x="530" y="115" fill="#45D7FF" font-size="13" text-anchor="middle">Admission</text>
+  <text x="530" y="133" fill="#A6ADB7" font-size="10" text-anchor="middle">explicit, recorded act</text>
+  <text x="530" y="148" fill="#6F7782" font-size="10" text-anchor="middle">artifact_id minted</text>
+
+  <!-- Artifact -->
+  <rect x="660" y="95" width="130" height="60" rx="2" fill="#171717" stroke="#343434"/>
+  <text x="725" y="121" fill="#F2F2F2" font-size="13" text-anchor="middle">Artifact</text>
+  <text x="725" y="140" fill="#6F7782" font-size="10" text-anchor="middle">governed</text>
+
+  <!-- Sealed event chain -->
+  <rect x="820" y="95" width="120" height="60" rx="2" fill="#171717" stroke="#343434"/>
+  <text x="880" y="115" fill="#F2F2F2" font-size="12" text-anchor="middle">Event chain</text>
+  <text x="880" y="131" fill="#F2F2F2" font-size="12" text-anchor="middle">sealed</text>
+  <text x="880" y="147" fill="#6F7782" font-size="10" text-anchor="middle">recomputable</text>
+
+  <!-- arrows -->
+  <line x1="180" y1="125" x2="224" y2="125" stroke="#6F7782" stroke-width="1" marker-end="url(#arr)"/>
+  <line x1="300" y1="125" x2="319" y2="125" stroke="#6F7782" stroke-width="1" marker-end="url(#arr)"/>
+  <line x1="430" y1="125" x2="444" y2="125" stroke="#6F7782" stroke-width="1" marker-end="url(#arr)"/>
+  <line x1="610" y1="125" x2="654" y2="125" stroke="#6F7782" stroke-width="1" marker-end="url(#arr)"/>
+  <line x1="790" y1="125" x2="814" y2="125" stroke="#6F7782" stroke-width="1" marker-end="url(#arr)"/>
+
+  <!-- caption -->
+  <text x="480" y="225" fill="#6F7782" font-size="11" text-anchor="middle">Forge Lite demonstration path. Identity and legitimacy are conferred at Admission — never inferred from storage.</text>
+</svg>
