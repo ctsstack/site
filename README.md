@@ -12,7 +12,7 @@ CTS (Cognition Topology Stack) defines the structural substrate for a local-firs
 
 CTS is not an application and not the full system. It is the topological layer that underpins and enables the broader Cognitive Operating Environment (COE).
 
-This repository is the canonical source of truth for CTS topology, protocol definitions, and reference implementations.
+This is the public website for CTS — and is a projection of the canonical governance corpus ans is NOT a source of truth.
 
 What CTS Is
 A structural framework defining relationships, boundaries, and flow of cognition
