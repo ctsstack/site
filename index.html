@@ -39,7 +39,7 @@ body {
 .wrap { max-width: var(--cts-content-max); margin: 0 auto; padding: 0 24px; }
 @media (min-width: 720px) { .wrap { padding: 0 40px; } }
 .reading { max-width: var(--cts-reading-max); }
-section { padding: var(--cts-section-gap) 0 0; }
+section { padding: var(--cts-section-gap) 0 0; scroll-margin-top: 72px; }
 h1, h2, h3 { color: var(--cts-text); font-weight: 600; line-height: 1.2; }
 h1 { font-size: clamp(2rem, 5vw, 3.1rem); letter-spacing: -0.02em; }
 h2 { font-size: 1.6rem; margin-bottom: 20px; }
@@ -85,6 +85,10 @@ a:hover { text-decoration: underline; }
 }
 /* Header */
 header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--cts-bg);
   border-bottom: 1px solid var(--cts-border);
   padding: 18px 0;
 }
@@ -228,7 +232,7 @@ V5 lineage-seal recomputation    <span class="ok">[PASS]</span> seal 2af65b7a…
       </div>
     </div>
     <p class="reading" style="margin-top:16px; color: var(--cts-text-muted); font-size: 0.9rem;">Between the two panels sits one explicit act: the operator typed <span class="mono">ADMIT</span>. Identity and legitimacy were created by that act — recorded, digest-chained, and recomputable from the evidence.</p>
-    <p class="reading" style="margin-top:12px; color: var(--cts-text-muted); font-size: 0.9rem;">Output from preserved run <span class="mono">golden_run_001</span> — real output, not a mockup. Forge Lite is a working implementation; full Forge integration with the hardened governance system remains in development.</p>
+    <p class="reading" style="margin-top:12px; color: var(--cts-text-muted); font-size: 0.9rem;">Output from preserved run <span class="mono">golden_run_001</span> — real output, not a mockup. Forge is defined in CTS governance and under active development; Forge Lite is the working reduced-friction profile used to demonstrate the admission discipline today.</p>
   </div>
 </section>
 
