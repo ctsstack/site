@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CTS — Cognition Topology Stack</title>
+  <meta name="description" content="CTS is the architectural substrate for preserving context, provenance, and continuity across knowledge work.">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Big Shoulders Display"','sans-serif'],
+            mono:    ['"Courier Prime"','Courier','monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    /* ── TOKENS ─────────────────────────────────────── */
+    :root {
+      --void:     #000000;
+      --surf:     rgba(245,240,232,0.025);
+      --bd:       rgba(245,240,232,0.07);
+      --bd-lo:    rgba(245,240,232,0.04);
+      --hi:       #F5F0E8;
+      --mid:      #8A8278;
+      --lo:       #4A4540;
+      --mute:     #1C1814;
+      --amber:    #FBBF24;
+      --amber-d:  #D97706;
+      --ar:       251,191,36;
+    }
+
+    /* ── BASE ───────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; }
+    html { background: var(--void); scroll-behavior: smooth; }
+    body {
+      font-family: 'Courier Prime', Courier, monospace;
+      font-weight: 400;
+      background: var(--void);
+      color: var(--hi);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      line-height: 1.7;
+    }
+
+    /* ── TYPOGRAPHY ─────────────────────────────────── */
+    .D  { font-family: 'Big Shoulders Display', sans-serif; line-height: 0.88; letter-spacing: -0.01em; }
+    .LB { font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; font-family: 'Courier Prime', monospace; }
+
+    /* ── LAYOUT ─────────────────────────────────────── */
+    .W { max-width: 1080px; margin: 0 auto; padding: 0 2rem; }
+    .SP { padding: 7rem 0; }
+
+    /* ── HERO GRID BACKGROUND ───────────────────────── */
+    .grid-bg {
+      background-image:
+        linear-gradient(rgba(var(--ar),0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(var(--ar),0.03) 1px, transparent 1px);
+      background-size: 64px 64px;
+    }
+
+    /* ── SCAN LINE ──────────────────────────────────── */
+    @keyframes scan {
+      0%   { top:0%;   opacity:0; }
+      3%   { opacity:1; }
+      97%  { opacity:.6; }
+      100% { top:100%; opacity:0; }
+    }
+    .scan {
+      position: absolute; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(var(--ar),.55) 25%, rgba(var(--ar),.7) 50%, rgba(var(--ar),.55) 75%, transparent);
+      box-shadow: 0 0 28px rgba(var(--ar),.25);
+      animation: scan 16s linear infinite;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* ── LIVE DOT ───────────────────────────────────── */
+    @keyframes amberPulse {
+      0%,100% { opacity:1; }
+      50%     { opacity:.3; }
+    }
+    .dot {
+      width:6px; height:6px; border-radius:50%;
+      background: var(--mid);
+      display: inline-block; flex-shrink: 0;
+      animation: amberPulse 2.2s ease infinite;
+    }
+    .dot.a { background: var(--amber); }
+
+    /* ── BUTTONS ────────────────────────────────────── */
+    .BTN-A {
+      display:inline-block; background:transparent;
+      border:1px solid rgba(var(--ar),.55); color:var(--amber);
+      font-family:'Courier Prime',monospace; font-size:.68rem;
+      letter-spacing:.12em; text-transform:uppercase;
+      padding:.85rem 2.1rem; text-decoration:none;
+      transition:background .2s, border-color .2s, box-shadow .2s;
+      cursor:pointer;
+    }
+    .BTN-A:hover {
+      background:rgba(var(--ar),.07);
+      border-color:var(--amber);
+      box-shadow:0 0 32px rgba(var(--ar),.2);
+    }
+    .BTN-B {
+      display:inline-block; background:transparent;
+      border:1px solid var(--bd-lo); color:var(--lo);
+      font-family:'Courier Prime',monospace; font-size:.68rem;
+      letter-spacing:.12em; text-transform:uppercase;
+      padding:.85rem 2.1rem; text-decoration:none;
+      transition:border-color .2s, color .2s;
+    }
+    .BTN-B:hover { border-color:rgba(245,240,232,.2); color:var(--mid); }
+
+    /* ── NAV ────────────────────────────────────────── */
+    #nav {
+      position:fixed; top:0; left:0; right:0; z-index:100;
+      background:rgba(0,0,0,.9); backdrop-filter:blur(18px);
+      border-bottom:1px solid var(--bd-lo);
+    }
+    .nav-in {
+      max-width:1080px; margin:0 auto; padding:0 2rem;
+      height:3.2rem; display:flex; align-items:center; justify-content:space-between;
+    }
+    .nav-ln {
+      font-size:.6rem; letter-spacing:.16em; text-transform:uppercase;
+      color:var(--lo); text-decoration:none; transition:color .2s;
+      font-family:'Courier Prime',monospace;
+    }
+    .nav-ln:hover { color:var(--mid); }
+
+    /* ── STATUS STRIP ───────────────────────────────── */
+    .sc {
+      padding:.9rem 1.5rem; border-right:1px solid var(--bd-lo);
+      display:flex; align-items:center; gap:.65rem; flex:1; min-width:120px;
+    }
+    .sc:last-child { border-right:none; }
+
+    /* ── LAYER BANDS ────────────────────────────────── */
+    .layer { border-top:1px solid var(--bd-lo); padding:5rem 0; }
+
+    /* ── DISPATCH ROWS ──────────────────────────────── */
+    .DR {
+      display:flex; align-items:flex-start; gap:2rem;
+      padding:1.75rem 0; border-bottom:1px solid var(--bd-lo);
+      text-decoration:none;
+      border-left:2px solid transparent; padding-left:.75rem;
+      transition:border-left-color .2s, background .2s;
+    }
+    .DR:hover { border-left-color:rgba(var(--ar),.5); background:rgba(var(--ar),.012); }
+
+    /* ── TERMINAL ───────────────────────────────────── */
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+    .caret { animation:blink .8s step-end infinite; color:var(--amber); }
+
+    /* ── REVEALS ────────────────────────────────────── */
+    .rv {
+      opacity:0; transform:translateY(16px);
+      transition:opacity .7s ease, transform .7s ease;
+    }
+    .rv.on  { opacity:1; transform:translateY(0); }
+    .rv.d1  { transition-delay:.1s; }
+    .rv.d2  { transition-delay:.2s; }
+    .rv.d3  { transition-delay:.35s; }
+
+    /* ── ACCESSIBILITY ──────────────────────────────── */
+    :focus-visible {
+      outline: 1px solid var(--amber);
+      outline-offset: 3px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .001ms !important;
+      }
+      .rv { opacity:1 !important; transform:none !important; }
+      .scan { display:none; }
+    }
+
+    /* ── RESPONSIVE ─────────────────────────────────── */
+    @media (max-width:768px) {
+      .hero-hl  { font-size:clamp(4.5rem,20vw,9rem) !important; }
+      .R2       { grid-template-columns:1fr !important; }
+      .R13      { grid-template-columns:1fr !important; }
+      .sc       { border-right:none; border-bottom:1px solid var(--bd-lo); flex:0 0 50%; }
+      .nav-lks  { display:none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════ NAV ══════════ -->
+<nav id="nav">
+  <div class="nav-in">
+    <div style="display:flex;align-items:center;gap:.9rem;">
+      <span class="D" style="font-size:.9rem;font-weight:900;color:var(--hi);letter-spacing:.02em;">CTS</span>
+      <span class="LB" style="color:var(--mute);">/ Cognition Topology Stack</span>
+    </div>
+    <div class="nav-lks" style="display:flex;align-items:center;gap:2rem;">
+      <a href="#layers"     class="nav-ln">Architecture</a>
+      <a href="#dcs"        class="nav-ln">DCS</a>
+      <a href="#governance" class="nav-ln">Governance</a>
+      <a href="#dispatches" class="nav-ln">Dispatches</a>
+      <!-- [DCS_LINK] -->
+      <a href="#dcs" class="BTN-A" style="padding:.4rem 1.1rem;font-size:.6rem;">Access DCS →</a>
+    </div>
+  </div>
+</nav>
+
+
+<!-- ══════════ §1 HERO ══════════ -->
+<section id="hero" style="position:relative;min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;padding-bottom:4.5rem;" class="grid-bg">
+
+  <div class="scan"></div>
+
+  <!-- radial vignette -->
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 35%,rgba(0,0,0,.75) 100%);pointer-events:none;"></div>
+  <!-- bottom fade -->
+  <div style="position:absolute;bottom:0;left:0;right:0;height:30%;background:linear-gradient(transparent,#000);pointer-events:none;z-index:2;"></div>
+
+  <div class="W" style="position:relative;z-index:3;padding-top:6rem;">
+
+    <!-- path breadcrumb -->
+    <div class="rv LB" style="color:var(--mute);margin-bottom:3rem;">
+      CTS <span style="color:rgba(var(--ar),.25);">·</span>
+      v2 <span style="color:rgba(var(--ar),.25);">·</span>
+      SUBSTRATE ACTIVE
+    </div>
+
+    <!-- HEADLINE — three stacked words, massive -->
+    <div class="rv d1">
+      <div class="D hero-hl" style="font-size:clamp(5.5rem,15vw,12rem);font-weight:900;color:var(--hi);">CONTEXT</div>
+      <div class="D hero-hl" style="font-size:clamp(5.5rem,15vw,12rem);font-weight:900;color:var(--amber);text-shadow:0 0 120px rgba(var(--ar),.25);">DOESN'T</div>
+      <div class="D hero-hl" style="font-size:clamp(5.5rem,15vw,12rem);font-weight:900;color:var(--hi);margin-bottom:3rem;">SURVIVE.</div>
+    </div>
+
+    <!-- sub-row: copy + live stack indicators -->
+    <div class="rv d2 R2" style="display:grid;grid-template-columns:1fr auto;gap:4rem;align-items:end;max-width:900px;">
+
+      <div>
+        <p style="font-size:.84rem;color:var(--mid);max-width:420px;line-height:1.95;margin-bottom:2.25rem;">
+          CTS is the architectural substrate for preserving context, provenance, and continuity across knowledge work.
+          Not a tool. Not an app. Infrastructure.
+        </p>
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+          <!-- [DCS_LINK] -->
+          <a href="#dcs"        class="BTN-A">Document Context Search →</a>
+          <!-- [SUBSTACK_LINK] -->
+          <a href="#dispatches" class="BTN-B">Dispatches ↗</a>
+        </div>
+      </div>
+
+      <!-- component status aside -->
+      <div style="border-left:1px solid var(--bd-lo);padding-left:2rem;display:flex;flex-direction:column;gap:1rem;">
+        <div style="display:flex;align-items:center;gap:.65rem;">
+          <span class="dot"></span><span class="LB" style="color:var(--lo);">Topology</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:.65rem;">
+          <span class="dot a"></span><span class="LB" style="color:rgba(var(--ar),.6);">DCS · Live</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:.65rem;">
+          <span class="dot"></span><span class="LB" style="color:var(--lo);">Governance</span>
+        </div>
+        <div style="height:1px;background:var(--bd-lo);"></div>
+        <div style="display:flex;align-items:center;gap:.65rem;">
+          <span class="dot a" style="animation-delay:.4s;"></span><span class="LB" style="color:rgba(var(--ar),.4);">COE · Emerging</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════ STATUS STRIP ══════════ -->
+<div style="border-top:1px solid var(--bd-lo);border-bottom:1px solid var(--bd-lo);background:rgba(245,240,232,.01);">
+  <div class="W" style="padding:0;">
+    <div style="display:flex;overflow-x:auto;">
+      <div class="sc"><span class="dot"></span>
+        <div><div class="LB" style="color:var(--mute);">Topology</div><div class="LB" style="color:var(--lo);font-size:.5rem;margin-top:.2rem;">DEFINED</div></div>
+      </div>
+      <div class="sc"><span class="dot"></span>
+        <div><div class="LB" style="color:var(--mute);">Governance</div><div class="LB" style="color:var(--lo);font-size:.5rem;margin-top:.2rem;">CANON ACTIVE</div></div>
+      </div>
+      <div class="sc"><span class="dot a"></span>
+        <div><div class="LB" style="color:var(--amber);">DCS</div><div class="LB" style="color:rgba(var(--ar),.5);font-size:.5rem;margin-top:.2rem;">NEW RELEASE</div></div>
+      </div>
+      <div class="sc"><span class="dot"></span>
+        <div><div class="LB" style="color:var(--mute);">RAG Core</div><div class="LB" style="color:var(--lo);font-size:.5rem;margin-top:.2rem;">OPERATIONAL</div></div>
+      </div>
+      <div class="sc"><span class="dot"></span>
+        <div><div class="LB" style="color:var(--mute);">SVT Vault</div><div class="LB" style="color:var(--lo);font-size:.5rem;margin-top:.2rem;">LOCAL-FIRST</div></div>
+      </div>
+      <div class="sc"><span class="dot a" style="animation-delay:.5s;"></span>
+        <div><div class="LB" style="color:var(--mute);">COE</div><div class="LB" style="color:var(--lo);font-size:.5rem;margin-top:.2rem;">EMERGING</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════ §2 PROBLEM ══════════ -->
+<section class="SP">
+  <div class="W">
+
+    <div class="rv" style="margin-bottom:4rem;">
+      <div class="LB" style="color:rgba(var(--ar),.4);margin-bottom:.4rem;">The Structural Failure</div>
+      <div style="height:1px;width:100px;background:linear-gradient(90deg,rgba(var(--ar),.4),transparent);margin-top:.4rem;"></div>
+    </div>
+
+    <div class="rv R2" style="display:grid;grid-template-columns:1fr 1fr;gap:0;">
+
+      <div style="padding:2.5rem 3rem 2.5rem 0;border-right:1px solid var(--bd-lo);border-bottom:1px solid var(--bd-lo);">
+        <div class="LB" style="color:var(--mute);margin-bottom:1rem;">01</div>
+        <h3 class="D" style="font-size:2rem;font-weight:900;color:var(--hi);margin-bottom:.75rem;">Context disappears.</h3>
+        <p style="font-size:.75rem;color:var(--lo);line-height:1.9;">Every session restarts. Conversations fragment across applications. The reasoning behind decisions evaporates before it matters again.</p>
+      </div>
+
+      <div style="padding:2.5rem 0 2.5rem 3rem;border-bottom:1px solid var(--bd-lo);">
+        <div class="LB" style="color:var(--mute);margin-bottom:1rem;">02</div>
+        <h3 class="D" style="font-size:2rem;font-weight:900;color:var(--hi);margin-bottom:.75rem;">Provenance is lost.</h3>
+        <p style="font-size:.75rem;color:var(--lo);line-height:1.9;">AI outputs lose attribution. Notes lose their origins. Work accumulates without the relationships that make it legible later.</p>
+      </div>
+
+      <div style="padding:2.5rem 3rem 2.5rem 0;border-right:1px solid var(--bd-lo);">
+        <div class="LB" style="color:var(--mute);margin-bottom:1rem;">03</div>
+        <h3 class="D" style="font-size:2rem;font-weight:900;color:var(--hi);margin-bottom:.75rem;">Recall degrades.</h3>
+        <p style="font-size:.75rem;color:var(--lo);line-height:1.9;">Search returns documents. Not understanding. Complex projects dissolve into disconnected artifacts with no path back to meaning.</p>
+      </div>
+
+      <div style="padding:2.5rem 0 2.5rem 3rem;">
+        <div class="LB" style="color:var(--mute);margin-bottom:1rem;">04</div>
+        <h3 class="D" style="font-size:2rem;font-weight:900;color:var(--hi);margin-bottom:.75rem;">Systems decay.</h3>
+        <p style="font-size:.75rem;color:var(--lo);line-height:1.9;">Without governance, entropy wins. Tools proliferate. Meaning dissipates. The knowledge environment becomes a liability, not an asset.</p>
+      </div>
+
+    </div>
+
+    <div class="rv" style="margin-top:4rem;padding-top:3rem;border-top:1px solid var(--bd-lo);">
+      <p class="D" style="font-size:clamp(1.4rem,3vw,2.1rem);font-weight:700;color:var(--hi);line-height:1.15;max-width:580px;">
+        This is an architectural failure.<br>
+        <span style="color:var(--amber);">CTS addresses it at the structural level.</span>
+      </p>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════ §3 THE STACK — HORIZONTAL LAYERS ══════════ -->
+<section id="layers" style="border-top:1px solid var(--bd-lo);">
+
+  <div style="padding:4rem 0 0;">
+    <div class="W rv">
+      <div class="LB" style="color:rgba(var(--ar),.4);margin-bottom:.75rem;">The Stack</div>
+      <div class="D" style="font-size:clamp(2rem,5vw,3.5rem);font-weight:900;color:var(--hi);line-height:.92;margin-bottom:4rem;">
+        Three layers.<br><span style="color:var(--amber);">One substrate.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- LAYER 01: TOPOLOGY -->
+  <div class="layer">
+    <div class="W">
+      <div class="rv R13" style="display:grid;grid-template-columns:220px 1fr;gap:4.5rem;align-items:start;">
+        <div>
+          <div class="LB" style="color:var(--mute);margin-bottom:.5rem;">Layer 01</div>
+          <div class="D" style="font-size:2.5rem;font-weight:900;color:var(--hi);line-height:.9;margin-bottom:.4rem;">TOPOLOGY</div>
+          <div class="LB" style="color:rgba(var(--ar),.35);">Structure</div>
+        </div>
+        <div>
+          <p style="font-size:.79rem;color:var(--mid);line-height:1.95;margin-bottom:2rem;max-width:520px;">
+            The governing layer. Defines how knowledge spaces are bounded, related, and evolved over time. CTS is not the environment — it is the topology that makes the environment possible. Tools operate <em>within</em> it. They do not define it.
+          </p>
+          <div style="display:flex;gap:4rem;flex-wrap:wrap;">
+            <div>
+              <div class="LB" style="color:var(--mute);margin-bottom:.5rem;">Defines</div>
+              <div style="font-size:.72rem;color:var(--lo);line-height:2.3;">Artifact boundaries<br>Layer separation model<br>Structural invariants<br>Continuity constraints</div>
+            </div>
+            <div>
+              <div class="LB" style="color:var(--mute);margin-bottom:.5rem;">Does not define</div>
+              <div style="font-size:.72rem;color:var(--mute);line-height:2.3;font-style:italic;">Tools that operate within it<br>Content stored in it<br>Applications built on it</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LAYER 02: TOOLS -->
+  <div class="layer" style="background:rgba(var(--ar),.01);">
+    <div class="W">
+      <div class="rv R13" style="display:grid;grid-template-columns:220px 1fr;gap:4.5rem;align-items:start;">
+        <div>
+          <div class="LB" style="color:var(--mute);margin-bottom:.5rem;">Layer 02</div>
+          <div class="D" style="font-size:2.5rem;font-weight:900;color:var(--hi);line-height:.9;margin-bottom:.4rem;">TOOLS</div>
+          <div class="LB" style="color:rgba(var(--ar),.35);">Execution</div>
+        </div>
+        <div>
+          <p style="font-size:.79rem;color:var(--mid);line-height:1.95;margin-bottom:2rem;max-width:520px;">
+            CTS-aligned capabilities that operationalize the topology. Tools perform within defined structural boundaries — they do not define them. Each tool is constrained by governance and shaped by the topology it inhabits.
+          </p>
+          <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:.65rem;padding:.7rem 1.1rem;border:1px solid rgba(var(--ar),.3);background:rgba(var(--ar),.04);">
+              <span class="dot a"></span>
+              <span class="LB" style="color:var(--amber);">DCS — Released</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:.65rem;padding:.7rem 1.1rem;border:1px solid var(--bd-lo);">
+              <span style="width:6px;height:6px;border-radius:50%;border:1px solid var(--lo);flex-shrink:0;"></span>
+              <span class="LB" style="color:var(--mute);">WEN — Operational</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:.65rem;padding:.7rem 1.1rem;border:1px solid var(--bd-lo);">
+              <span style="width:6px;height:6px;border-radius:50%;border:1px solid var(--lo);flex-shrink:0;"></span>
+              <span class="LB" style="color:var(--mute);">RAG Core — Operational</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LAYER 03: GOVERNANCE -->
+  <div class="layer">
+    <div class="W">
+      <div class="rv R13" style="display:grid;grid-template-columns:220px 1fr;gap:4.5rem;align-items:start;">
+        <div>
+          <div class="LB" style="color:var(--mute);margin-bottom:.5rem;">Layer 03</div>
+          <div class="D" style="font-size:2.5rem;font-weight:900;color:var(--hi);line-height:.9;margin-bottom:.4rem;">GOVERNANCE</div>
+          <div class="LB" style="color:rgba(var(--ar),.35);">Coherence</div>
+        </div>
+        <div>
+          <p style="font-size:.79rem;color:var(--mid);line-height:1.95;margin-bottom:1.5rem;max-width:520px;">
+            Meaning binds to artifacts, not to tools. Governed metadata, provenance chains, and artifact semantics ensure the system retains coherence under change. Without this layer, the stack is just storage.
+          </p>
+          <div style="font-size:.71rem;color:var(--lo);line-height:2.3;border-top:1px solid var(--bd-lo);padding-top:1rem;">
+            Artifact authority model ·· Metadata schema ·· Provenance chains ·· Frontmatter governance ·· Release tiers
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COE emergence bar -->
+  <div style="border-top:1px solid rgba(var(--ar),.1);background:rgba(var(--ar),.02);padding:1.75rem 0;">
+    <div class="W rv" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1.5rem;">
+      <div style="display:flex;align-items:center;gap:1.5rem;">
+        <span class="LB" style="color:rgba(var(--ar),.35);">Emergent Result</span>
+        <span style="color:var(--mute);">—</span>
+        <span class="D" style="font-size:1.05rem;font-weight:700;color:var(--mid);">Cognitive Operating Environment (COE)</span>
+      </div>
+      <p style="font-size:.7rem;color:var(--lo);max-width:380px;line-height:1.85;">The COE is not a component of CTS. It is what emerges when topology, tools, and governance operate together with structural integrity intact.</p>
+    </div>
+  </div>
+
+</section>
+
+
+<!-- ══════════ §4 DCS SPOTLIGHT ══════════ -->
+<section id="dcs" style="border-top:1px solid var(--bd-lo);padding:7rem 0;">
+  <div class="W">
+
+    <!-- header -->
+    <div class="rv" style="display:flex;align-items:center;gap:1.5rem;margin-bottom:3.5rem;flex-wrap:wrap;">
+      <div style="background:rgba(var(--ar),.07);border:1px solid rgba(var(--ar),.3);padding:.3rem 1rem;">
+        <span class="LB" style="color:var(--amber);">New Release</span>
+      </div>
+      <div class="LB" style="color:var(--mute);">First Working Capability · Document Context Search</div>
+    </div>
+
+    <!-- DCS two-column -->
+    <div class="rv R2" style="display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:start;margin-bottom:5rem;">
+
+      <!-- identity -->
+      <div>
+        <div class="D" style="font-size:clamp(2.5rem,5vw,4rem);font-weight:900;color:var(--hi);margin-bottom:1.5rem;line-height:.88;">
+          DOCUMENT<br>CONTEXT<br><span style="color:var(--amber);">SEARCH.</span>
+        </div>
+        <p style="font-size:.79rem;color:var(--mid);line-height:1.95;margin-bottom:.75rem;">
+          DCS converts document stores into retrievable context. Local-first, CTS-governed, designed to surface meaning rather than return files.
+        </p>
+        <p style="font-size:.79rem;color:var(--lo);line-height:1.95;margin-bottom:2rem;">
+          It is the first working proof that the architecture can be operationalized without compromising structural integrity. Not a pitch. A demonstration.
+        </p>
+        <!-- [DCS_LINK] -->
+        <a href="#" class="BTN-A">Access DCS →</a>
+
+        <!-- [INSERT DCS VISUAL / SCREENSHOT]
+             Target: ~440×220px, dark-themed.
+             Interface screenshot, terminal output, or arch diagram.  -->
+        <div style="margin-top:2.5rem;border:1px dashed rgba(var(--ar),.1);height:140px;display:flex;align-items:center;justify-content:center;">
+          <span class="LB" style="color:var(--mute);">[ DCS interface visual ]</span>
+        </div>
+      </div>
+
+      <!-- capability profile -->
+      <div>
+        <div class="LB" style="color:var(--mute);margin-bottom:1rem;">Capability Profile</div>
+        <div style="border-top:1px solid var(--bd-lo);">
+
+          <div style="padding:1.2rem 0;border-bottom:1px solid rgba(245,240,232,.03);display:flex;gap:1.25rem;">
+            <span style="color:var(--amber);font-size:.63rem;line-height:2;min-width:22px;flex-shrink:0;">01</span>
+            <div>
+              <div style="font-size:.81rem;font-weight:700;color:var(--hi);margin-bottom:.2rem;">Local-first retrieval</div>
+              <div style="font-size:.7rem;color:var(--lo);line-height:1.8;">Documents never leave the environment. Retrieval operates against governed local artifact stores only.</div>
+            </div>
+          </div>
+
+          <div style="padding:1.2rem 0;border-bottom:1px solid rgba(245,240,232,.03);display:flex;gap:1.25rem;">
+            <span style="color:var(--amber);font-size:.63rem;line-height:2;min-width:22px;flex-shrink:0;">02</span>
+            <div>
+              <div style="font-size:.81rem;font-weight:700;color:var(--hi);margin-bottom:.2rem;">Context, not matches</div>
+              <div style="font-size:.7rem;color:var(--lo);line-height:1.8;">Returns structured context grounded in provenance — not a ranked list of documents.</div>
+            </div>
+          </div>
+
+          <div style="padding:1.2rem 0;border-bottom:1px solid rgba(245,240,232,.03);display:flex;gap:1.25rem;">
+            <span style="color:var(--amber);font-size:.63rem;line-height:2;min-width:22px;flex-shrink:0;">03</span>
+            <div>
+              <div style="font-size:.81rem;font-weight:700;color:var(--hi);margin-bottom:.2rem;">Governance-aligned ingestion</div>
+              <div style="font-size:.7rem;color:var(--lo);line-height:1.8;">Artifacts are ingested with metadata intact. Authority levels and relationships survive retrieval.</div>
+            </div>
+          </div>
+
+          <div style="padding:1.2rem 0;display:flex;gap:1.25rem;">
+            <span style="color:var(--amber);font-size:.63rem;line-height:2;min-width:22px;flex-shrink:0;">04</span>
+            <div>
+              <div style="font-size:.81rem;font-weight:700;color:var(--hi);margin-bottom:.2rem;">CTS-native, not standalone</div>
+              <div style="font-size:.7rem;color:var(--lo);line-height:1.8;">DCS operates within the CTS topology as proof of the architecture under real workload conditions.</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── DCS DEMONSTRATION VIDEO ── -->
+    <div class="rv" style="border:1px solid rgba(var(--ar),.15);background:rgba(var(--ar),.02);padding:2.5rem;">
+
+      <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.75rem;flex-wrap:wrap;">
+        <span class="dot a"></span>
+        <span class="LB" style="color:rgba(var(--ar),.55);">DCS — Recorded Demonstration</span>
+        <span class="LB" style="color:var(--mute);margin-left:auto;">[RUNTIME]</span>
+      </div>
+
+      <!--
+        ═══ VIDEO EMBED — CLICK-TO-LOAD FACADE ═══
+        No iframe loads until the visitor presses play. No autoplay.
+        No third-party scripts on initial page load.
+
+        TO ACTIVATE — set two things on the wrapper div below:
+          data-embed  = the full embed URL of your hosted video
+          style       = background-image pointing at your poster frame
+
+        Embed URL formats:
+          Vimeo             https://player.vimeo.com/video/VIDEO_ID?autoplay=1
+          YouTube (unlisted) https://www.youtube-nocookie.com/embed/VIDEO_ID?autoplay=1
+          Cloudflare Stream  https://customer-CODE.cloudflarestream.com/VIDEO_ID/iframe?autoplay=1
+
+        POSTER FRAME — [DCS_POSTER.jpg]
+          16:9, 1920×1080. Must show DCS mid-retrieval with real output
+          visible on screen. Most visitors will never press play; this
+          frame is the demonstration for them. It has to work as a still.
+      -->
+      <div id="dcs-video"
+           data-embed=""
+           style="position:relative;width:100%;aspect-ratio:16/9;background:#0A0806 center/cover no-repeat;border:1px solid var(--bd-lo);cursor:pointer;overflow:hidden;"
+           onclick="loadVideo()"
+           onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();loadVideo();}"
+           role="button" tabindex="0" aria-label="Play DCS demonstration video">
+
+        <!-- scrim -->
+        <div style="position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(0,0,0,.25),rgba(0,0,0,.7));pointer-events:none;"></div>
+
+        <!-- grid texture (removed once a poster frame is set, if desired) -->
+        <div class="grid-bg" style="position:absolute;inset:0;opacity:.5;pointer-events:none;"></div>
+
+        <!-- play affordance -->
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.25rem;pointer-events:none;">
+          <div id="dcs-play"
+               style="width:74px;height:74px;border:1px solid rgba(var(--ar),.5);background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;transition:background .25s,border-color .25s,box-shadow .25s;">
+            <div style="width:0;height:0;border-left:16px solid var(--amber);border-top:10px solid transparent;border-bottom:10px solid transparent;margin-left:4px;"></div>
+          </div>
+          <div class="LB" style="color:rgba(var(--ar),.55);">Play demonstration</div>
+          <div class="LB" style="color:var(--mute);font-size:.5rem;">[ Poster frame — DCS_POSTER.jpg ]</div>
+        </div>
+
+      </div>
+
+      <!-- caption strip -->
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:1.5rem;flex-wrap:wrap;margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--bd-lo);">
+        <p style="font-size:.71rem;color:var(--lo);line-height:1.8;max-width:520px;">
+          Retrieval executed against a governed local artifact store. Context returned with provenance intact. No cloud round-trip, no index rebuild.
+        </p>
+        <span class="LB" style="color:var(--mute);white-space:nowrap;">Recorded · Unedited</span>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════ §5 GOVERNANCE ══════════ -->
+<section id="governance" style="border-top:1px solid var(--bd-lo);padding:7rem 0;">
+  <div class="W">
+
+    <div class="rv R13" style="display:grid;grid-template-columns:1fr 2fr;gap:5rem;align-items:start;">
+
+      <div>
+        <div class="LB" style="color:rgba(var(--ar),.4);margin-bottom:.75rem;">Governance Layer</div>
+        <div class="D" style="font-size:clamp(1.6rem,3vw,2.4rem);font-weight:900;color:var(--hi);line-height:1.0;margin-bottom:1rem;">
+          Meaning is an artifact property.<br>
+          <span style="color:var(--amber);">Not a tool property.</span>
+        </div>
+      </div>
+
+      <div>
+        <p style="font-size:.78rem;color:var(--mid);line-height:1.95;margin-bottom:2.5rem;max-width:500px;">
+          Most systems attach meaning to the application handling the work. When the application changes, meaning changes. CTS inverts this: governance binds to the artifact itself — not to any tool that handles it. The canonical record survives tooling changes, migrations, and time.
+        </p>
+
+        <!-- [GOVERNANCE_LINKS] — add href values once repos are public -->
+        <div style="border-top:1px solid var(--bd-lo);">
+
+          <div style="padding:1.25rem 0;border-bottom:1px solid rgba(245,240,232,.03);display:flex;justify-content:space-between;align-items:start;gap:2rem;">
+            <div>
+              <div style="font-size:.84rem;font-weight:700;color:var(--hi);margin-bottom:.3rem;">Governance Charter</div>
+              <div style="font-size:.7rem;color:var(--lo);">Constitutional document. Authority levels, artifact semantics, governance scope.</div>
+            </div>
+            <span class="LB" style="color:var(--mute);white-space:nowrap;padding-top:.1rem;">CANON</span>
+          </div>
+
+          <div style="padding:1.25rem 0;border-bottom:1px solid rgba(245,240,232,.03);display:flex;justify-content:space-between;align-items:start;gap:2rem;">
+            <div>
+              <div style="font-size:.84rem;font-weight:700;color:var(--hi);margin-bottom:.3rem;">Metadata Schema</div>
+              <div style="font-size:.7rem;color:var(--lo);">Canonical schema governing frontmatter, provenance fields, and artifact typing across the vault.</div>
+            </div>
+            <span class="LB" style="color:var(--mute);white-space:nowrap;padding-top:.1rem;">SCHEMA</span>
+          </div>
+
+          <div style="padding:1.25rem 0;border-bottom:1px solid rgba(245,240,232,.03);display:flex;justify-content:space-between;align-items:start;gap:2rem;">
+            <div>
+              <div style="font-size:.84rem;font-weight:700;color:var(--hi);margin-bottom:.3rem;">Topology Definitions</div>
+              <div style="font-size:.7rem;color:var(--lo);">Formal specification of the CTS layer model, boundary conditions, and structural invariants.</div>
+            </div>
+            <span class="LB" style="color:var(--mute);white-space:nowrap;padding-top:.1rem;">SPEC</span>
+          </div>
+
+          <div style="padding:1.25rem 0;display:flex;justify-content:space-between;align-items:start;gap:2rem;">
+            <div>
+              <div style="font-size:.84rem;font-weight:700;color:var(--hi);margin-bottom:.3rem;">Artifact & Provenance Model</div>
+              <div style="font-size:.7rem;color:var(--lo);">Artifact types, authority inheritance, and provenance chain construction across the system.</div>
+            </div>
+            <span class="LB" style="color:var(--mute);white-space:nowrap;padding-top:.1rem;">MODEL</span>
+          </div>
+
+        </div>
+
+        <p style="font-size:.63rem;color:var(--mute);margin-top:1.25rem;line-height:1.8;font-style:italic;">
+          Governance artifacts are the canonical record. This page is a projection of them, not their source.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════ §6 DISPATCHES ══════════ -->
+<section id="dispatches" style="border-top:1px solid var(--bd-lo);padding:7rem 0;">
+  <div class="W">
+
+    <div class="rv" style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:3.5rem;flex-wrap:wrap;gap:1.5rem;">
+      <div>
+        <div class="LB" style="color:rgba(var(--ar),.4);margin-bottom:.75rem;">Signal Feed</div>
+        <div class="D" style="font-size:clamp(2rem,4vw,3rem);font-weight:900;color:var(--hi);line-height:.9;">DISPATCHES</div>
+      </div>
+      <!-- [SUBSTACK_LINK] -->
+      <a href="#" class="BTN-B">All dispatches ↗</a>
+    </div>
+
+    <!-- [DISPATCH ENTRIES]
+         Replace each block with real Substack data.
+         Fields per entry: title, one-line thesis, ISO date, read time (minutes).  -->
+
+    <div class="rv" style="border-top:1px solid var(--bd-lo);">
+
+      <a href="#" class="DR">  <!-- [DISPATCH_1_LINK] -->
+        <div class="LB" style="color:var(--mute);min-width:28px;padding-top:.15rem;">01</div>
+        <div style="flex:1;">
+          <div style="font-size:.9rem;font-weight:700;color:var(--hi);margin-bottom:.4rem;">[Dispatch 1 Title]</div>
+          <p style="font-size:.71rem;color:var(--lo);max-width:520px;line-height:1.85;">[One-line thesis — replace with actual Substack entry abstract.]</p>
+        </div>
+        <div style="text-align:right;flex-shrink:0;padding-top:.1rem;">
+          <div class="LB" style="color:var(--mute);">[DATE]</div>
+          <div class="LB" style="color:var(--mute);margin-top:.35rem;">[N] min</div>
+        </div>
+      </a>
+
+      <a href="#" class="DR">  <!-- [DISPATCH_2_LINK] -->
+        <div class="LB" style="color:var(--mute);min-width:28px;padding-top:.15rem;">02</div>
+        <div style="flex:1;">
+          <div style="font-size:.9rem;font-weight:700;color:var(--hi);margin-bottom:.4rem;">[Dispatch 2 Title]</div>
+          <p style="font-size:.71rem;color:var(--lo);max-width:520px;line-height:1.85;">[One-line thesis.]</p>
+        </div>
+        <div style="text-align:right;flex-shrink:0;padding-top:.1rem;">
+          <div class="LB" style="color:var(--mute);">[DATE]</div>
+          <div class="LB" style="color:var(--mute);margin-top:.35rem;">[N] min</div>
+        </div>
+      </a>
+
+      <a href="#" class="DR">  <!-- [DISPATCH_3_LINK] -->
+        <div class="LB" style="color:var(--mute);min-width:28px;padding-top:.15rem;">03</div>
+        <div style="flex:1;">
+          <div style="font-size:.9rem;font-weight:700;color:var(--hi);margin-bottom:.4rem;">[Dispatch 3 Title]</div>
+          <p style="font-size:.71rem;color:var(--lo);max-width:520px;line-height:1.85;">[One-line thesis.]</p>
+        </div>
+        <div style="text-align:right;flex-shrink:0;padding-top:.1rem;">
+          <div class="LB" style="color:var(--mute);">[DATE]</div>
+          <div class="LB" style="color:var(--mute);margin-top:.35rem;">[N] min</div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════ §7 CLOSE — TERMINAL BOOT SEQUENCE ══════════ -->
+<section style="border-top:1px solid var(--bd-lo);padding:8rem 0 5rem;">
+  <div class="W">
+    <div style="max-width:580px;">
+
+      <div class="rv D" style="font-size:clamp(2.5rem,6vw,4.5rem);font-weight:900;color:var(--hi);line-height:.88;margin-bottom:2rem;">
+        THE SUBSTRATE<br><span style="color:var(--amber);">IS LIVE.</span>
+      </div>
+
+      <p class="rv" style="font-size:.78rem;color:var(--lo);line-height:1.95;margin-bottom:3.5rem;">
+        DCS is the first surface.<br>
+        The architecture is operational.<br>
+        Governance is in effect.
+      </p>
+
+      <!-- TERMINAL BOOT SEQUENCE — this is the signature element -->
+      <div id="term-wrap" class="rv"
+        style="background:rgba(245,240,232,.015);border:1px solid var(--bd-lo);padding:1.75rem;margin-bottom:2.5rem;min-height:170px;font-family:'Courier Prime',monospace;font-size:.71rem;line-height:2.1;">
+        <div id="term-lines"></div>
+        <span id="term-caret" style="display:none;" class="caret">▊</span>
+      </div>
+
+      <!-- [DCS_LINK] — CTA fades in after terminal sequence completes -->
+      <a href="#" class="BTN-A" id="term-cta"
+        style="font-size:.75rem;padding:1rem 2.5rem;opacity:0;transition:opacity .6s ease;pointer-events:none;">
+        Enter System →
+      </a>
+
+      <div style="margin-top:3rem;display:flex;align-items:center;gap:.75rem;">
+        <span class="dot a"></span>
+        <span class="LB" style="color:var(--mute);">CTS · System operational</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- FOOTER -->
+<footer style="border-top:1px solid rgba(245,240,232,.04);padding:1.5rem 0;">
+  <div class="W" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+    <span class="LB" style="color:var(--mute);">CTS — Cognition Topology Stack</span>
+    <div style="display:flex;gap:2rem;">
+      <!-- [GITHUB_LINK] [SUBSTACK_LINK] -->
+      <a href="#" class="LB" style="color:var(--mute);text-decoration:none;transition:color .2s;"
+        onmouseover="this.style.color='#4A4540'" onmouseout="this.style.color=''">GitHub ↗</a>
+      <a href="#" class="LB" style="color:var(--mute);text-decoration:none;transition:color .2s;"
+        onmouseover="this.style.color='#4A4540'" onmouseout="this.style.color=''">Substack ↗</a>
+    </div>
+  </div>
+</footer>
+
+
+<script>
+  // ── Scroll reveals ───────────────────────────────────────────────────
+  const io = new IntersectionObserver(
+    es => es.forEach(e => { if(e.isIntersecting){e.target.classList.add('on');io.unobserve(e.target);} }),
+    { threshold: 0.07, rootMargin: '0px 0px -28px 0px' }
+  );
+  document.querySelectorAll('.rv').forEach(el => io.observe(el));
+
+
+  // ── Terminal boot sequence ───────────────────────────────────────────
+  const LINES = [
+    { t: '> INITIALIZING CTS SUBSTRATE...',         c: 'var(--lo)',   d: 450 },
+    { t: '> TOPOLOGY LAYER .......... OK',           c: 'var(--mid)',  d: 220 },
+    { t: '> GOVERNANCE CANON ........ OK',           c: 'var(--mid)',  d: 220 },
+    { t: '> SVT VAULT ............... OK',           c: 'var(--mid)',  d: 220 },
+    { t: '> RAG CORE ................ OK',           c: 'var(--mid)',  d: 220 },
+    { t: '> DCS OPERATIONAL ......... OK',           c: '#FBBF24',    d: 280 },
+    { t: '>',                                         c: 'var(--lo)',   d: 180 },
+    { t: '> SUBSTRATE READY.',                        c: '#FBBF24',    d: 0   },
+  ];
+
+  let termFired = false;
+  const termWrap = document.getElementById('term-wrap');
+  const REDUCED  = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const termObs = new IntersectionObserver(es => {
+    es.forEach(e => {
+      if(e.isIntersecting && !termFired){ termFired = true; runTerminal(); }
+    });
+  }, { threshold: 0.35 });
+
+  if(termWrap) termObs.observe(termWrap);
+
+  function runTerminal() {
+    const linesEl  = document.getElementById('term-lines');
+    const caretEl  = document.getElementById('term-caret');
+    const ctaEl    = document.getElementById('term-cta');
+
+    const finish = () => {
+      caretEl.style.display = 'none';
+      if(ctaEl){ ctaEl.style.opacity = '1'; ctaEl.style.pointerEvents = 'auto'; }
+    };
+
+    // Reduced motion: print the whole sequence at once, no typing theatre.
+    if (REDUCED) {
+      LINES.forEach(l => {
+        const ln = document.createElement('div');
+        ln.style.color = l.c;
+        ln.textContent = l.t;
+        linesEl.appendChild(ln);
+      });
+      finish();
+      return;
+    }
+
+    caretEl.style.display = 'inline';
+
+    let i = 0;
+    function next() {
+      if(i >= LINES.length) { finish(); return; }
+      const ln = document.createElement('div');
+      ln.style.color = LINES[i].c;
+      ln.textContent  = LINES[i].t;
+      linesEl.appendChild(ln);
+      const delay = LINES[i].d;
+      i++;
+      setTimeout(next, delay);
+    }
+    setTimeout(next, 300);
+  }
+
+
+  // ── DCS video — click-to-load facade ─────────────────────────────────
+  // Nothing third-party loads until the visitor chooses to play.
+  function loadVideo() {
+    const box = document.getElementById('dcs-video');
+    const src = box.getAttribute('data-embed');
+
+    if (!src) {
+      box.querySelector('#dcs-play').style.borderColor = 'rgba(251,191,36,.2)';
+      return; // no embed URL set yet — facade stays put
+    }
+
+    const f = document.createElement('iframe');
+    f.src = src;
+    f.setAttribute('allow', 'autoplay; fullscreen; picture-in-picture');
+    f.setAttribute('allowfullscreen', '');
+    f.setAttribute('title', 'DCS demonstration');
+    f.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:0;';
+
+    box.innerHTML = '';
+    box.style.cursor = 'default';
+    box.removeAttribute('role');
+    box.removeAttribute('tabindex');
+    box.onclick = null;
+    box.appendChild(f);
+  }
+
+  // play-button hover state
+  (function () {
+    const box = document.getElementById('dcs-video');
+    if (!box) return;
+    const btn = () => document.getElementById('dcs-play');
+    box.addEventListener('mouseenter', () => {
+      const b = btn(); if (!b) return;
+      b.style.background   = 'rgba(251,191,36,.1)';
+      b.style.borderColor  = 'var(--amber)';
+      b.style.boxShadow    = '0 0 40px rgba(251,191,36,.2)';
+    });
+    box.addEventListener('mouseleave', () => {
+      const b = btn(); if (!b) return;
+      b.style.background   = 'rgba(0,0,0,.55)';
+      b.style.borderColor  = 'rgba(251,191,36,.5)';
+      b.style.boxShadow    = 'none';
+    });
+  })();
+</script>
+</body>
+</html>
